@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title>WeatherSphere - Live Interactive Weather Map & Radar Forecast</title>
+    <meta name="title" content="WeatherSphere - Live Interactive Weather Map & Radar Forecast" />
+    <meta name="description" content="Real-time live weather radar, wind streamline layers, 7-day forecast, air quality monitoring, and global weather insights — Windy-style interactive map." />
+    <meta name="theme-color" content="#0B0F19" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://weathersphere.app/" />
+    <meta property="og:title" content="WeatherSphere - Live Interactive Weather Map & Radar" />
+    <meta property="og:description" content="Real-time global radar, wind vectors, 7-day forecast, air quality, and weather alerts." />
+    <meta property="og:image" content="https://weathersphere.app/og-image.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WeatherSphere - Live Interactive Weather Map" />
+    <meta name="twitter:description" content="Windy-style wind maps, precipitation radar, 7-day forecasts, and AQI monitoring." />
+
+    <!-- Google Fonts (preconnect first, then stylesheet) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <style>
+      html, body, #root {
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #0B0F19;
+      }
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-[#0B0F19] text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
