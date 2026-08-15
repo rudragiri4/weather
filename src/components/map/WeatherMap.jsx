@@ -25,7 +25,7 @@ const customPinIcon = new L.Icon({
 function MapRecenter({ center }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, 9, { duration: 1.5 });
+    map.flyTo(center, 7, { duration: 1.5 });
   }, [center, map]);
   return null;
 }
@@ -42,7 +42,7 @@ function MapEventsInspector({ onLocationSelect }) {
   return null;
 }
 
-export const WeatherMap = ({ height = "h-[650px]", fullScreen = false }) => {
+export const WeatherMap = ({ height = "h-[420px] sm:h-[550px] lg:h-[650px]", fullScreen = false }) => {
   const { currentLocation, setLocation } = useLocation();
   const { weatherData } = useWeather();
   const { tempUnit, windUnit } = useSettings();
@@ -72,7 +72,7 @@ export const WeatherMap = ({ height = "h-[650px]", fullScreen = false }) => {
     <div className={`relative w-full ${height} rounded-3xl overflow-hidden border border-slate-800 shadow-2xl z-10 group`}>
       <MapContainer
         center={center}
-        zoom={8}
+        zoom={5}
         scrollWheelZoom={true}
         className="w-full h-full bg-[#0B0F19]"
         attributionControl={false}

@@ -1,242 +1,159 @@
 import React, { useState } from 'react';
-import { X, Settings, Shield, Key, Eye, EyeOff, Save, Check } from 'lucide-react';
+import { 
+  X, 
+  Settings, 
+  Moon, 
+  Sun, 
+  Thermometer, 
+  Wind, 
+  Gauge, 
+  CloudRain, 
+  MapPin, 
+  Bell, 
+  Layers, 
+  Info, 
+  Check, 
+  Save,
+  ShieldCheck,
+  Sparkles
+} from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { useLocation } from '../../context/LocationContext';
 
 export const SettingsModal = ({ onClose }) => {
   const {
+    theme,
     tempUnit,
     windUnit,
     pressureUnit,
-    apiKey,
-    weatherProvider,
-    windyKey,
-    windyModel,
+    precipUnit,
+    weatherAlerts,
+    severeAlerts,
+    defaultMapLayer,
+    mapAnimations,
     saveSettings
   } = useSettings();
 
+  const { currentLocation, detectLocation, isDetecting } = useLocation();
+
   // Local state for settings form
-  const [provider, setProvider] = useState(weatherProvider);
-  const [openWeatherKeyInput, setOpenWeatherKeyInput] = useState(apiKey);
-  const [windyKeyInput, setWindyKeyInput] = useState(windyKey);
-  const [model, setModel] = useState(windyModel);
+  const [themeState, setThemeState] = useState(theme);
   const [tempUnitState, setTempUnitState] = useState(tempUnit);
   const [windUnitState, setWindUnitState] = useState(windUnit);
   const [pressureUnitState, setPressureUnitState] = useState(pressureUnit);
+  const [precipUnitState, setPrecipUnitState] = useState(precipUnit);
+  const [weatherAlertsState, setWeatherAlertsState] = useState(weatherAlerts);
+  const [severeAlertsState, setSevereAlertsState] = useState(severeAlerts);
+  const [defaultLayerState, setDefaultLayerState] = useState(defaultMapLayer);
+  const [mapAnimationsState, setMapAnimationsState] = useState(mapAnimations);
 
-  // Key Visibility states
-  const [showOWKey, setShowOWKey] = useState(false);
-  const [showWindyKey, setShowWindyKey] = useState(false);
-
-  // Success state on Save
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSave = (e) => {
     e.preventDefault();
     saveSettings({
+      theme: themeState,
       tempUnit: tempUnitState,
       windUnit: windUnitState,
       pressureUnit: pressureUnitState,
-      apiKey: openWeatherKeyInput,
-      weatherProvider: provider,
-      windyKey: windyKeyInput,
-      windyModel: model
+      precipUnit: precipUnitState,
+      weatherAlerts: weatherAlertsState,
+      severeAlerts: severeAlertsState,
+      defaultMapLayer: defaultLayerState,
+      mapAnimations: mapAnimationsState
     });
     setSaveSuccess(true);
     setTimeout(() => {
       setSaveSuccess(false);
       onClose();
-    }, 1200);
+    }, 900);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
-        
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0" 
+        onClick={onClose} 
+        aria-hidden="true" 
+      />
+
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-label="WeatherSphere Settings"
+        className="relative z-10 bg-[#0e1628] border border-white/15 rounded-3xl p-5 sm:p-6 max-w-lg w-full shadow-[0_20px_60px_rgba(0,0,0,0.85)] max-h-[90vh] overflow-y-auto space-y-5 scrollbar-thin animate-slideUp"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
-            <Settings className="w-5 h-5 text-cyan-400 animate-spin-slow" />
-            WeatherSphere Settings
+        <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+          <div className="flex items-center gap-2.5 text-white font-bold text-base sm:text-lg">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <Settings className="w-4 h-4" />
+            </div>
+            <span>WeatherSphere Settings</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-850 transition"
+            className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition"
+            title="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-6">
-          {/* Data Provider Selection */}
-          <div className="space-y-3">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-              Weather Data Provider
+        <form onSubmit={handleSave} className="space-y-5 text-slate-200">
+          {/* 1. Appearance */}
+          <div className="space-y-2.5">
+            <label className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Moon className="w-3.5 h-3.5 text-cyan-400" /> Appearance
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Open-Meteo */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setProvider('open-meteo')}
-                className={`flex flex-col text-left p-3.5 rounded-2xl border transition ${
-                  provider === 'open-meteo'
-                    ? 'bg-cyan-500/10 border-cyan-500 text-white shadow-glow-cyan'
-                    : 'bg-slate-950/40 border-slate-800/80 text-slate-300 hover:border-slate-700 hover:bg-slate-950/70'
+                onClick={() => setThemeState('dark')}
+                className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl border text-xs font-bold transition min-h-[44px] ${
+                  themeState === 'dark'
+                    ? 'bg-cyan-500/20 border-cyan-500/60 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)]'
+                    : 'bg-[#142034]/60 border-white/8 text-slate-400 hover:text-slate-200 hover:bg-[#142034]'
                 }`}
               >
-                <span className="font-bold text-xs">Open-Meteo</span>
-                <span className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                  Free, no API key required. High accuracy global forecast.
-                </span>
+                <Moon className="w-4 h-4 text-cyan-400" />
+                <span>Dark Theme</span>
               </button>
 
-              {/* OpenWeather */}
               <button
                 type="button"
-                onClick={() => setProvider('openweather')}
-                className={`flex flex-col text-left p-3.5 rounded-2xl border transition ${
-                  provider === 'openweather'
-                    ? 'bg-cyan-500/10 border-cyan-500 text-white shadow-glow-cyan'
-                    : 'bg-slate-950/40 border-slate-800/80 text-slate-300 hover:border-slate-700 hover:bg-slate-950/70'
+                onClick={() => setThemeState('light')}
+                className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl border text-xs font-bold transition min-h-[44px] ${
+                  themeState === 'light'
+                    ? 'bg-cyan-500/20 border-cyan-500/60 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)]'
+                    : 'bg-[#142034]/60 border-white/8 text-slate-400 hover:text-slate-200 hover:bg-[#142034]'
                 }`}
               >
-                <span className="font-bold text-xs">OpenWeather</span>
-                <span className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                  Requires key. Supports One Call 3.0 & Free 2.5 APIs.
-                </span>
-              </button>
-
-              {/* Windy */}
-              <button
-                type="button"
-                onClick={() => setProvider('windy')}
-                className={`flex flex-col text-left p-3.5 rounded-2xl border transition ${
-                  provider === 'windy'
-                    ? 'bg-cyan-500/10 border-cyan-500 text-white shadow-glow-cyan'
-                    : 'bg-slate-950/40 border-slate-800/80 text-slate-300 hover:border-slate-700 hover:bg-slate-950/70'
-                }`}
-              >
-                <span className="font-bold text-xs">Windy Point API</span>
-                <span className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                  Requires Windy API key. Premium grid point values.
-                </span>
+                <Sun className="w-4 h-4 text-amber-400" />
+                <span>Light Theme</span>
               </button>
             </div>
           </div>
 
-          {/* Conditional Key Fields */}
-          {provider === 'openweather' && (
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3 animate-slideDown">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                <Shield className="w-4 h-4 text-cyan-400" />
-                OpenWeather Integration Config
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-medium">OpenWeather API Key</label>
-                <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
-                  <Key className="w-3.5 h-3.5 text-slate-500" />
-                  <input
-                    type={showOWKey ? 'text' : 'password'}
-                    value={openWeatherKeyInput}
-                    onChange={(e) => setOpenWeatherKeyInput(e.target.value)}
-                    placeholder="Enter your OpenWeather API Key"
-                    className="w-full bg-transparent text-xs text-slate-200 focus:outline-none placeholder-slate-600"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowOWKey(!showOWKey)}
-                    className="text-slate-400 hover:text-slate-200 transition"
-                  >
-                    {showOWKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <p className="text-[10px] text-slate-500 leading-normal">
-                Don't have a key? Sign up at{' '}
-                <a
-                  href="https://openweathermap.org/api"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-cyan-400 hover:underline"
-                >
-                  openweathermap.org
-                </a>
-                . Both One Call 3.0 keys and standard Free 2.5 API keys are supported automatically.
-              </p>
-            </div>
-          )}
-
-          {provider === 'windy' && (
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-4 animate-slideDown">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                <Shield className="w-4 h-4 text-cyan-400" />
-                Windy API Integration Config
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-medium">Windy Point API Key</label>
-                <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
-                  <Key className="w-3.5 h-3.5 text-slate-500" />
-                  <input
-                    type={showWindyKey ? 'text' : 'password'}
-                    value={windyKeyInput}
-                    onChange={(e) => setWindyKeyInput(e.target.value)}
-                    placeholder="Enter your Windy API Key"
-                    className="w-full bg-transparent text-xs text-slate-200 focus:outline-none placeholder-slate-600"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowWindyKey(!showWindyKey)}
-                    className="text-slate-400 hover:text-slate-200 transition"
-                  >
-                    {showWindyKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-medium">Weather Forecast Model</label>
-                <select
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-350 focus:outline-none focus:border-cyan-500/50"
-                >
-                  <option value="gfs">GFS (Global Forecast System) - Standard</option>
-                  <option value="ecmwf">ECMWF (European Centre) - Highly Accurate</option>
-                  <option value="icon">ICON (German Meteorological Service)</option>
-                  <option value="arome">AROME (Météo-France) - High Res Europe</option>
-                </select>
-              </div>
-
-              <p className="text-[10px] text-slate-500 leading-normal">
-                Requires a Point Forecast key. Get one at{' '}
-                <a
-                  href="https://api.windy.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-cyan-400 hover:underline"
-                >
-                  api.windy.com
-                </a>
-                .
-              </p>
-            </div>
-          )}
-
-          {/* Unit Preferences */}
-          <div className="space-y-4 border-t border-slate-850 pt-4">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-              Unit Settings
+          {/* 2. Weather Units */}
+          <div className="space-y-3 pt-3 border-t border-white/8">
+            <label className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Thermometer className="w-3.5 h-3.5 text-cyan-400" /> Weather Units
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Temp Unit */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-medium">Temperature</span>
-                <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Temperature Unit */}
+              <div className="space-y-1 bg-[#142034]/60 border border-white/8 rounded-2xl p-3">
+                <span className="text-[11px] text-slate-300 font-semibold block">Temperature</span>
+                <div className="flex bg-[#0a0d16] p-1 rounded-xl border border-white/8 mt-1">
                   <button
                     type="button"
                     onClick={() => setTempUnitState('C')}
-                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition ${
-                      tempUnitState === 'C' ? 'bg-cyan-500 text-slate-950 shadow' : 'text-slate-400 hover:text-slate-200'
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition ${
+                      tempUnitState === 'C'
+                        ? 'bg-cyan-500 text-slate-950 shadow'
+                        : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Celsius (°C)
@@ -244,8 +161,10 @@ export const SettingsModal = ({ onClose }) => {
                   <button
                     type="button"
                     onClick={() => setTempUnitState('F')}
-                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition ${
-                      tempUnitState === 'F' ? 'bg-cyan-500 text-slate-950 shadow' : 'text-slate-400 hover:text-slate-200'
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition ${
+                      tempUnitState === 'F'
+                        ? 'bg-cyan-500 text-slate-950 shadow'
+                        : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Fahrenheit (°F)
@@ -254,62 +173,194 @@ export const SettingsModal = ({ onClose }) => {
               </div>
 
               {/* Wind Speed Unit */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-medium">Wind Speed</span>
+              <div className="space-y-1 bg-[#142034]/60 border border-white/8 rounded-2xl p-3">
+                <span className="text-[11px] text-slate-300 font-semibold block">Wind Speed</span>
                 <select
                   value={windUnitState}
                   onChange={(e) => setWindUnitState(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none"
+                  className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-cyan-500 mt-1"
                 >
-                  <option value="kmh">km/h</option>
-                  <option value="mph">mph</option>
-                  <option value="ms">m/s</option>
-                  <option value="knots">knots</option>
+                  <option value="kmh">km/h (Kilometers / hour)</option>
+                  <option value="mph">mph (Miles / hour)</option>
+                  <option value="ms">m/s (Meters / second)</option>
+                  <option value="knots">knots (Nautical knots)</option>
                 </select>
               </div>
 
               {/* Pressure Unit */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-medium">Atmospheric Pressure</span>
+              <div className="space-y-1 bg-[#142034]/60 border border-white/8 rounded-2xl p-3">
+                <span className="text-[11px] text-slate-300 font-semibold block">Pressure</span>
                 <select
                   value={pressureUnitState}
                   onChange={(e) => setPressureUnitState(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none"
+                  className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-cyan-500 mt-1"
                 >
-                  <option value="hpa">hPa</option>
-                  <option value="inhg">inHg</option>
+                  <option value="hpa">hPa (Hectopascals / mbar)</option>
+                  <option value="inhg">inHg (Inches of Mercury)</option>
+                </select>
+              </div>
+
+              {/* Precipitation Unit */}
+              <div className="space-y-1 bg-[#142034]/60 border border-white/8 rounded-2xl p-3">
+                <span className="text-[11px] text-slate-300 font-semibold block">Precipitation</span>
+                <select
+                  value={precipUnitState}
+                  onChange={(e) => setPrecipUnitState(e.target.value)}
+                  className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-cyan-500 mt-1"
+                >
+                  <option value="mm">Millimeters (mm)</option>
+                  <option value="in">Inches (in)</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 border-t border-slate-850 pt-5 mt-6">
+          {/* 3. Location & Geolocation */}
+          <div className="space-y-2.5 pt-3 border-t border-white/8">
+            <label className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-cyan-400" /> Location Preferences
+            </label>
+            
+            <div className="bg-[#142034]/60 border border-white/8 rounded-2xl p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-300 font-medium">Default Location Region</span>
+                <span className="font-bold text-cyan-300 bg-cyan-500/15 px-2.5 py-1 rounded-lg border border-cyan-500/30">
+                  India (Default)
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between pt-2 border-t border-white/6 text-xs">
+                <div>
+                  <div className="font-semibold text-slate-200">Current Active Location</div>
+                  <div className="text-[11px] text-slate-400">{currentLocation?.name}, {currentLocation?.country || 'India'}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={detectLocation}
+                  disabled={isDetecting}
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-bold text-[11px] border border-cyan-500/40 transition flex items-center gap-1.5"
+                >
+                  <MapPin className="w-3 h-3 text-cyan-400" />
+                  {isDetecting ? 'Detecting...' : 'Detect Now'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Notifications & Alerts */}
+          <div className="space-y-2.5 pt-3 border-t border-white/8">
+            <label className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Bell className="w-3.5 h-3.5 text-cyan-400" /> Weather Alerts & Notifications
+            </label>
+            <div className="space-y-2">
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-[#142034]/60 border border-white/8 hover:border-white/15 transition cursor-pointer">
+                <div>
+                  <span className="text-xs font-bold text-slate-200 block">Severe Weather Alerts</span>
+                  <span className="text-[10px] text-slate-400 block">Show meteorological warning badges for high winds, storms and rain</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={severeAlertsState}
+                  onChange={(e) => setSevereAlertsState(e.target.checked)}
+                  className="w-4 h-4 text-cyan-500 rounded bg-slate-900 border-slate-700 focus:ring-cyan-400"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-[#142034]/60 border border-white/8 hover:border-white/15 transition cursor-pointer">
+                <div>
+                  <span className="text-xs font-bold text-slate-200 block">Air Quality Warnings</span>
+                  <span className="text-[10px] text-slate-400 block">Alert when AQI exceeds unhealthy threshold levels</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={weatherAlertsState}
+                  onChange={(e) => setWeatherAlertsState(e.target.checked)}
+                  className="w-4 h-4 text-cyan-500 rounded bg-slate-900 border-slate-700 focus:ring-cyan-400"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* 5. Map Preferences */}
+          <div className="space-y-2.5 pt-3 border-t border-white/8">
+            <label className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-cyan-400" /> Map Preferences
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-[#142034]/60 border border-white/8 rounded-2xl p-3">
+                <span className="text-[11px] text-slate-300 font-semibold block">Default Initial Layer</span>
+                <select
+                  value={defaultLayerState}
+                  onChange={(e) => setDefaultLayerState(e.target.value)}
+                  className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-cyan-500 mt-1"
+                >
+                  <option value="wind">Wind Streamlines</option>
+                  <option value="temp">Temperature Heatmap</option>
+                  <option value="rain">Precipitation / Radar</option>
+                  <option value="clouds">Cloud Cover</option>
+                  <option value="pressure">Atmospheric Pressure</option>
+                  <option value="waves">Waves & Ocean</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#142034]/60 border border-white/8">
+                <div>
+                  <span className="text-xs font-bold text-slate-200 block">Streamline Animations</span>
+                  <span className="text-[10px] text-slate-400 block">Smooth live wind particles</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={mapAnimationsState}
+                  onChange={(e) => setMapAnimationsState(e.target.checked)}
+                  className="w-4 h-4 text-cyan-500 rounded bg-slate-900 border-slate-700 focus:ring-cyan-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 6. About & Data Attribution */}
+          <div className="pt-3 border-t border-white/8 space-y-2">
+            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+              <Info className="w-3.5 h-3.5 text-cyan-400" /> About WeatherSphere
+            </div>
+            <div className="bg-[#142034]/40 border border-white/6 rounded-2xl p-3 text-[11px] text-slate-400 space-y-1 leading-relaxed">
+              <div className="flex justify-between items-center text-slate-300 font-bold">
+                <span>WeatherSphere v2.4.0</span>
+                <span className="text-cyan-400 text-[10px] font-mono">Live Radar Edition</span>
+              </div>
+              <p>
+                Weather telemetry provided by global meteorological networks & Open-Meteo ECMWF models. High-resolution radar and wind flow streamlines updated in real time.
+              </p>
+            </div>
+          </div>
+
+          {/* Footer Action Buttons */}
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/8">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold text-xs transition"
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saveSuccess}
-              className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition ${
+              className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition ${
                 saveSuccess
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950'
+                  ? 'bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.5)]'
+                  : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]'
               }`}
             >
               {saveSuccess ? (
                 <>
-                  <Check className="w-3.5 h-3.5 animate-bounce" />
-                  Saved!
+                  <Check className="w-4 h-4 animate-bounce" />
+                  <span>Preferences Saved!</span>
                 </>
               ) : (
                 <>
-                  <Save className="w-3.5 h-3.5" />
-                  Save Changes
+                  <Save className="w-4 h-4" />
+                  <span>Save Changes</span>
                 </>
               )}
             </button>

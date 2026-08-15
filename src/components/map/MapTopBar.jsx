@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CloudSun, Menu, X, BookOpen, BarChart3, ShieldAlert,
-  Share2, Info, Settings, Wind
+  Share2, Info, Settings, Wind, Search
 } from 'lucide-react';
-import { SearchBar } from '../common/SearchBar';
+import { SearchModal } from '../common/SearchModal';
 import { ShareModal } from '../common/ShareModal';
 import { SettingsModal } from '../common/SettingsModal';
 import { useWeather } from '../../context/WeatherContext';
@@ -22,6 +22,7 @@ export const MapTopBar = ({ onTogglePanel, panelOpen }) => {
   const { weatherData, loading } = useWeather();
   const { currentLocation, hasSearched } = useLocation();
   const { tempUnit } = useSettings();
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -33,32 +34,38 @@ export const MapTopBar = ({ onTogglePanel, panelOpen }) => {
 
   return (
     <>
-      <div className="absolute top-0 left-0 right-0 z-[1000] flex items-center gap-2 px-3 py-2.5 bg-gradient-to-b from-[#0a0d16]/95 via-[#0a0d16]/60 to-transparent pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-[1000] flex items-center justify-between gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5 bg-gradient-to-b from-[#0a0d16]/95 via-[#0a0d16]/70 to-transparent pointer-events-none">
 
-        {/* Logo */}
-        <Link
-          to="/"
-          className="pointer-events-auto flex items-center gap-2 shrink-0 group"
-        >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition shadow-cyan-500/30">
-            <CloudSun className="w-5 h-5 text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <span className="font-display text-sm font-extrabold text-white leading-tight block">
-              Weather<span className="text-cyan-400">Sphere</span>
-            </span>
-            <span className="text-[9px] text-slate-500 font-medium uppercase tracking-widest -mt-0.5 block">
-              Live Radar
-            </span>
-          </div>
-        </Link>
+        {/* Left: Logo & Brand */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <Link
+            to="/"
+            className="pointer-events-auto flex items-center gap-2 group"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition shadow-cyan-500/30 shrink-0">
+              <CloudSun className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </div>
+            <div className="hidden xs:block sm:block">
+              <span className="font-display text-xs sm:text-sm font-extrabold text-white leading-tight block">
+                Weather<span className="text-cyan-400">Sphere</span>
+              </span>
+              <span className="text-[8px] sm:text-[9px] text-slate-500 font-medium uppercase tracking-widest -mt-0.5 block">
+                Live Radar
+              </span>
+            </div>
+          </Link>
 
-        {/* Search bar */}
-        <div className="pointer-events-auto flex-1 max-w-sm">
-          <SearchBar placeholder="Search city or coordinates..." compact />
+          {/* Search Trigger Button */}
+          <button
+            onClick={() => setSearchModalOpen(true)}
+            title="Search city (Click or tap)"
+            className="pointer-events-auto flex items-center gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#0a0d16]/85 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-white transition shadow-lg backdrop-blur-md text-xs font-medium group"
+          >
+            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
+            <span className="hidden sm:inline text-slate-300">Search city...</span>
+            <span className="sm:hidden text-xs font-semibold text-cyan-300">Search</span>
+          </button>
         </div>
-
-        <div className="flex-1" />
 
         {/* Right Controls */}
         <div className="pointer-events-auto flex items-center gap-1.5">
@@ -160,6 +167,7 @@ export const MapTopBar = ({ onTogglePanel, panelOpen }) => {
         </div>
       </div>
 
+      {searchModalOpen && <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />}
       {shareOpen && <ShareModal onClose={() => setShareOpen(false)} />}
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </>

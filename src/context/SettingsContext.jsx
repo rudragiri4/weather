@@ -19,6 +19,30 @@ export const SettingsProvider = ({ children }) => {
     return localStorage.getItem('ws_unit_pressure') || 'hpa'; // 'hpa', 'inhg'
   });
 
+  const [precipUnit, setPrecipUnit] = useState(() => {
+    return localStorage.getItem('ws_unit_precip') || 'mm'; // 'mm', 'in'
+  });
+
+  const [weatherAlerts, setWeatherAlerts] = useState(() => {
+    const saved = localStorage.getItem('ws_weather_alerts');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [severeAlerts, setSevereAlerts] = useState(() => {
+    const saved = localStorage.getItem('ws_severe_alerts');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [defaultMapLayer, setDefaultMapLayer] = useState(() => {
+    return localStorage.getItem('ws_default_layer') || 'wind';
+  });
+
+  const [mapAnimations, setMapAnimations] = useState(() => {
+    const saved = localStorage.getItem('ws_map_animations');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  // Internal API state (preserved for background service stability)
   const [apiKey, setApiKey] = useState(() => {
     return localStorage.getItem('ws_openweather_key') || '';
   });
@@ -56,6 +80,10 @@ export const SettingsProvider = ({ children }) => {
   };
 
   const saveSettings = (newSettings) => {
+    if (newSettings.theme) {
+      setTheme(newSettings.theme);
+      localStorage.setItem('ws_theme', newSettings.theme);
+    }
     if (newSettings.tempUnit) {
       setTempUnit(newSettings.tempUnit);
       localStorage.setItem('ws_unit_temp', newSettings.tempUnit);
@@ -67,6 +95,26 @@ export const SettingsProvider = ({ children }) => {
     if (newSettings.pressureUnit) {
       setPressureUnit(newSettings.pressureUnit);
       localStorage.setItem('ws_unit_pressure', newSettings.pressureUnit);
+    }
+    if (newSettings.precipUnit) {
+      setPrecipUnit(newSettings.precipUnit);
+      localStorage.setItem('ws_unit_precip', newSettings.precipUnit);
+    }
+    if (newSettings.weatherAlerts !== undefined) {
+      setWeatherAlerts(newSettings.weatherAlerts);
+      localStorage.setItem('ws_weather_alerts', JSON.stringify(newSettings.weatherAlerts));
+    }
+    if (newSettings.severeAlerts !== undefined) {
+      setSevereAlerts(newSettings.severeAlerts);
+      localStorage.setItem('ws_severe_alerts', JSON.stringify(newSettings.severeAlerts));
+    }
+    if (newSettings.defaultMapLayer) {
+      setDefaultMapLayer(newSettings.defaultMapLayer);
+      localStorage.setItem('ws_default_layer', newSettings.defaultMapLayer);
+    }
+    if (newSettings.mapAnimations !== undefined) {
+      setMapAnimations(newSettings.mapAnimations);
+      localStorage.setItem('ws_map_animations', JSON.stringify(newSettings.mapAnimations));
     }
     if (newSettings.apiKey !== undefined) {
       setApiKey(newSettings.apiKey);
@@ -90,13 +138,25 @@ export const SettingsProvider = ({ children }) => {
     <SettingsContext.Provider
       value={{
         theme,
+        setTheme,
         toggleTheme,
         tempUnit,
+        setTempUnit,
         toggleTempUnit,
         windUnit,
         setWindUnit,
         pressureUnit,
         setPressureUnit,
+        precipUnit,
+        setPrecipUnit,
+        weatherAlerts,
+        setWeatherAlerts,
+        severeAlerts,
+        setSevereAlerts,
+        defaultMapLayer,
+        setDefaultMapLayer,
+        mapAnimations,
+        setMapAnimations,
         apiKey,
         weatherProvider,
         windyKey,

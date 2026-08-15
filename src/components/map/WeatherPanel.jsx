@@ -65,111 +65,21 @@ export const WeatherPanel = ({ onClose }) => {
     { id: 'aqi', label: 'Air', icon: '💨' },
   ];
 
-  // ── 1. EMPTY / SEARCH STATE (Before any city is searched) ──
-  if (!hasSearched) {
+  // ── 1. LOADING STATE (When fetching weather data) ──
+  if (!weatherData || loading) {
     return (
-      <div className="absolute left-3 top-14 sm:top-16 z-[1000] w-[310px] sm:w-[330px] max-h-[calc(100vh-80px)] flex flex-col animate-slideInLeft weather-panel-container pointer-events-auto">
-        <div className="bg-[#0e1628]/95 backdrop-blur-3xl border border-white/12 rounded-3xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] overflow-hidden flex flex-col">
-          
-          {/* Header */}
-          <div className="p-4 pb-3 flex items-center justify-between border-b border-white/8 bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-transparent">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                <Compass className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <h3 className="font-display font-extrabold text-sm text-white leading-tight">
-                  Weather<span className="text-cyan-400">Sphere</span>
-                </h3>
-                <p className="text-[10px] text-slate-400 font-medium">Interactive Radar</p>
-              </div>
-            </div>
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
-                title="Close panel"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+      <div className="absolute left-2.5 sm:left-3 top-14 sm:top-16 z-[1000] w-[calc(100vw-20px)] xs:w-[310px] sm:w-[335px] max-h-[calc(100vh-80px)] flex flex-col animate-slideInLeft weather-panel-container pointer-events-auto">
+        <div className="bg-[#0e1628]/95 backdrop-blur-3xl border border-white/12 rounded-3xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] p-5 space-y-3 text-center">
+          <div className="w-10 h-10 mx-auto rounded-2xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 animate-spin">
+            <RefreshCw className="w-5 h-5" />
           </div>
-
-          {/* Search Prompt Body */}
-          <div className="p-5 space-y-4 overflow-y-auto weather-panel-scroll">
-            
-            <div className="text-center py-2 space-y-2">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_24px_rgba(6,182,212,0.25)]">
-                <Search className="w-6 h-6" />
-              </div>
-              <h2 className="font-display text-base font-extrabold text-white">
-                Search for a location
-              </h2>
-              <p className="text-xs text-slate-300 leading-relaxed px-2">
-                Enter a city name or coordinates to view live weather details.
-              </p>
-            </div>
-
-            {/* Locate Me Action Button */}
-            <button
-              onClick={detectLocation}
-              disabled={isDetecting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-cyan-500/15 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition shadow-lg shadow-cyan-950/40 group"
-            >
-              <MapPin className={`w-4 h-4 text-cyan-400 ${isDetecting ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`} />
-              <span>{isDetecting ? 'Detecting your location...' : 'Use Current Location'}</span>
-            </button>
-
-            {/* Quick Explore Cities */}
-            <div className="space-y-2 pt-1 border-t border-white/8">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <span className="flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-cyan-400" /> Popular Cities
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {QUICK_CITIES.map((city) => (
-                  <button
-                    key={city.name}
-                    onClick={() => setLocation(city, true)}
-                    className="flex flex-col text-left px-3 py-2 rounded-xl bg-[#142034]/90 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-500/40 transition group"
-                  >
-                    <span className="font-bold text-xs text-slate-200 group-hover:text-cyan-300 transition truncate">
-                      {city.name}
-                    </span>
-                    <span className="text-[10px] text-slate-400 truncate">
-                      {city.country}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Hint */}
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/6 text-center text-[10px] text-slate-400 leading-normal">
-              💡 You can also use the top search bar or click on the map to inspect weather anywhere.
-            </div>
-          </div>
+          <p className="text-xs font-bold text-slate-200">Fetching live weather data for {currentLocation.name}...</p>
         </div>
       </div>
     );
   }
 
-  // ── 2. LOADING STATE (When searched, but fetching data) ──
-  if (!weatherData) {
-    return (
-      <div className="absolute left-3 top-14 sm:top-16 z-[1000] w-[310px] sm:w-[330px] max-h-[calc(100vh-80px)] flex flex-col animate-slideInLeft weather-panel-container pointer-events-auto">
-        <div className="bg-[#0e1628]/95 backdrop-blur-3xl border border-white/12 rounded-3xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] p-5 space-y-4 text-center">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 animate-spin">
-            <RefreshCw className="w-6 h-6" />
-          </div>
-          <p className="text-xs font-bold text-slate-300">Fetching live weather data for {currentLocation.name}...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ── 3. COMPLETE WEATHER DETAILS STATE (After location is selected) ──
+  // ── 2. COMPLETE WEATHER DETAILS STATE ──
   const { current, daily, hourly, airQuality } = weatherData;
   const condition = getWeatherCondition(current.weatherCode);
   const aqiInfo = getAQIDetails(airQuality?.usAqi);

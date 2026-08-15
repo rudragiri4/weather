@@ -1,21 +1,25 @@
 export const DEFAULT_LOCATION = {
-  name: 'New York',
-  country: 'United States',
-  countryCode: 'US',
-  latitude: 40.7128,
-  longitude: -74.0060,
-  admin1: 'New York'
+  name: 'New Delhi',
+  country: 'India',
+  countryCode: 'IN',
+  latitude: 28.6139,
+  longitude: 77.2090,
+  admin1: 'Delhi'
 };
 
 export const POPULAR_CITIES = [
-  { name: 'New York', country: 'United States', latitude: 40.7128, longitude: -74.0060, flag: '🇺🇸' },
+  { name: 'Mumbai', country: 'India', latitude: 19.0760, longitude: 72.8777, flag: '🇮🇳' },
+  { name: 'New Delhi', country: 'India', latitude: 28.6139, longitude: 77.2090, flag: '🇮🇳' },
+  { name: 'Bengaluru', country: 'India', latitude: 12.9716, longitude: 77.5946, flag: '🇮🇳' },
+  { name: 'Ahmedabad', country: 'India', latitude: 23.0225, longitude: 72.5714, flag: '🇮🇳' },
+  { name: 'Kolkata', country: 'India', latitude: 22.5726, longitude: 88.3639, flag: '🇮🇳' },
+  { name: 'Chennai', country: 'India', latitude: 13.0827, longitude: 80.2707, flag: '🇮🇳' },
+  { name: 'Hyderabad', country: 'India', latitude: 17.3850, longitude: 78.4867, flag: '🇮🇳' },
+  { name: 'Pune', country: 'India', latitude: 18.5204, longitude: 73.8567, flag: '🇮🇳' },
   { name: 'London', country: 'United Kingdom', latitude: 51.5074, longitude: -0.1278, flag: '🇬🇧' },
+  { name: 'New York', country: 'United States', latitude: 40.7128, longitude: -74.0060, flag: '🇺🇸' },
   { name: 'Tokyo', country: 'Japan', latitude: 35.6762, longitude: 139.6503, flag: '🇯🇵' },
-  { name: 'Paris', country: 'France', latitude: 48.8566, longitude: 2.3522, flag: '🇫🇷' },
-  { name: 'Sydney', country: 'Australia', latitude: -33.8688, longitude: 151.2093, flag: '🇦🇺' },
-  { name: 'Dubai', country: 'United Arab Emirates', latitude: 25.2048, longitude: 55.2708, flag: '🇦🇪' },
-  { name: 'Singapore', country: 'Singapore', latitude: 1.3521, longitude: 103.8198, flag: '🇸🇬' },
-  { name: 'Rio de Janeiro', country: 'Brazil', latitude: -22.9068, longitude: -43.1729, flag: '🇧🇷' }
+  { name: 'Dubai', country: 'United Arab Emirates', latitude: 25.2048, longitude: 55.2708, flag: '🇦🇪' }
 ];
 
 export const WMO_WEATHER_CODES = {

@@ -13,11 +13,12 @@ import {
   Menu, 
   X,
   Share2,
-  Settings
+  Settings,
+  Search
 } from 'lucide-react';
 import { UnitToggle } from './UnitToggle';
 import { ThemeToggle } from './ThemeToggle';
-import { SearchBar } from './SearchBar';
+import { SearchModal } from './SearchModal';
 import { useLocation } from '../../context/LocationContext';
 import { ShareModal } from './ShareModal';
 import { SettingsModal } from './SettingsModal';
@@ -28,6 +29,7 @@ export const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const navLinks = [
     { path: '/', label: 'Overview', icon: CloudSun },
@@ -85,8 +87,17 @@ export const Header = () => {
               })}
             </nav>
 
-            {/* Actions: Unit toggle, Share, Mobile menu */}
-            <div className="flex items-center gap-2 shrink-0">
+            {/* Actions: Search, Unit toggle, Share, Settings, Mobile menu */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button
+                onClick={() => setSearchOpen(true)}
+                title="Search City"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-slate-900 border border-slate-700/80 text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/40 transition shadow-inner text-xs font-semibold"
+              >
+                <Search className="w-4 h-4" />
+                <span className="hidden md:inline text-slate-300">Search</span>
+              </button>
+
               <button
                 onClick={() => setShareOpen(true)}
                 title="Share Weather Report"
@@ -120,9 +131,18 @@ export const Header = () => {
         {/* Mobile Navigation Drawer */}
         {mobileOpen && (
           <div className="lg:hidden bg-slate-950/95 backdrop-blur-2xl border-b border-slate-800 px-4 pt-3 pb-6 space-y-3">
-            <div className="mb-3">
-              <SearchBar compact />
-            </div>
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                setSearchOpen(true);
+              }}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold text-xs hover:bg-cyan-500/20 transition"
+            >
+              <span className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-cyan-400" /> Search City or Coordinates
+              </span>
+              <span className="text-[10px] text-slate-400">Open 🔍</span>
+            </button>
 
             <div className="grid grid-cols-2 gap-2">
               {navLinks.map((link) => {
@@ -149,6 +169,7 @@ export const Header = () => {
         )}
       </header>
 
+      {searchOpen && <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
       {shareOpen && <ShareModal onClose={() => setShareOpen(false)} />}
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </>

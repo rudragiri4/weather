@@ -7,6 +7,8 @@ const WINDY_OVERLAY_MAP = {
   wind: 'wind',
   temp: 'temp',
   rain: 'rain',
+  radar: 'radar',
+  satellite: 'satellite',
   clouds: 'clouds',
   pressure: 'pressure',
   waves: 'waves',
@@ -20,26 +22,37 @@ export const FullscreenMap = ({ activeLayer }) => {
   const iframeRef = useRef(null);
   const prevLocationRef = useRef(null);
 
-  const lat = currentLocation?.latitude ?? 22.29;
-  const lon = currentLocation?.longitude ?? 70.79;
+  // Default India geographic center if initial view, otherwise selected city coords
+  const isIndia = (currentLocation?.countryCode === 'IN' || currentLocation?.country === 'India' || currentLocation?.name === 'India' || currentLocation?.name === 'New Delhi');
+  const lat = hasSearched 
+    ? (currentLocation?.latitude ?? 28.6139)
+    : (isIndia ? 22.50 : (currentLocation?.latitude ?? 22.50));
+  const lon = hasSearched
+    ? (currentLocation?.longitude ?? 77.2090)
+    : (isIndia ? 79.50 : (currentLocation?.longitude ?? 79.50));
+    
+  // Dynamic zoom: wide overview for default India view (zoom 5), closer zoom for searched city (zoom 7)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const zoom = hasSearched ? (isMobile ? 6 : 7) : (isMobile ? 4 : 5);
+
   const windyOverlay = WINDY_OVERLAY_MAP[activeLayer] || 'wind';
   const metricTemp = tempUnit === 'F' ? '°F' : '°C';
   const metricWind = windUnit === 'mph' ? 'mph' : windUnit === 'ms' ? 'm/s' : windUnit === 'knots' ? 'kt' : 'km/h';
 
   // Build Windy embed URL
-  const windyUrl = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&width=650&height=450&zoom=6&level=surface&overlay=${windyOverlay}&product=ecmwf&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&metricWind=${encodeURIComponent(metricWind)}&metricTemp=${encodeURIComponent(metricTemp)}&radarRange=-1`;
+  const windyUrl = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&width=650&height=450&zoom=${zoom}&level=surface&overlay=${windyOverlay}&product=ecmwf&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&metricWind=${encodeURIComponent(metricWind)}&metricTemp=${encodeURIComponent(metricTemp)}&radarRange=-1`;
 
   // Track location changes - reload iframe src to recenter
   useEffect(() => {
     if (
       iframeRef.current &&
       prevLocationRef.current &&
-      (prevLocationRef.current.latitude !== lat || prevLocationRef.current.longitude !== lon)
+      (prevLocationRef.current.latitude !== lat || prevLocationRef.current.longitude !== lon || prevLocationRef.current.hasSearched !== hasSearched)
     ) {
       iframeRef.current.src = windyUrl;
     }
-    prevLocationRef.current = { latitude: lat, longitude: lon };
-  }, [lat, lon, windyUrl]);
+    prevLocationRef.current = { latitude: lat, longitude: lon, hasSearched };
+  }, [lat, lon, hasSearched, windyUrl]);
 
   return (
     <div className="windy-map-wrapper relative">
